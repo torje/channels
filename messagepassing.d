@@ -2,9 +2,10 @@ import std.concurrency, std.stdio, std.typecons, core.thread;
 import channels;
 void spawnMe2(shared BlockingChannel!int ch){
   bool cont = true;
+  int rec;
   while ( cont ){
-    int rec =  ch.extract() ;
-    if ( rec != 0 ){
+
+    if (  ch.extract(rec)  ){
       writeln("I received something on my channel! : " ,rec);
       if ( rec == 10 ){
         writeln("I have to quit");

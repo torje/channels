@@ -1,36 +1,33 @@
 import std.typecons;
 synchronized class NonBlockingChannel(t){
+  alias Bundle = Tuple!(bool,t);
   private shared t[] queue;
   void insert(t i){
     queue ~= i;
   }
-  t extract( t defaultTo ){
+  bool extract( ref  t  defaultTo ){
     if ( queue.length == 0){
-      return defaultTo;
+      return false;
     }else{
       t ret = queue[0];
       queue = queue[1..$];
-      return ret;
+      defaultTo = ret;
+      return true;
     }
   }
 }
 
 class BlockingChannel(MessageType){
-  alias Bundle = Tuple!(bool,MessageType);
-  private shared NonBlockingChannel!Bundle queue;
+  private shared NonBlockingChannel!MessageType queue;
   this(){
-    queue = new NonBlockingChannel!Bundle;
+    queue = new NonBlockingChannel!MessageType;
   }
   void insert(MessageType msg)shared{
-    Bundle bundle = tuple(true,msg);
-    queue.insert(bundle);
+    queue.insert(msg);
   }
-  MessageType extract()shared{
-    Bundle bundle;
-    bundle[0] = false;
-    while ( false == bundle[0] ){
-      bundle = queue.extract( bundle );
+  bool extract(ref MessageType msg)shared{
+    while ( false == queue.extract(msg) ) {
     }
-    return bundle[1];
+    return true;
   }
 }
