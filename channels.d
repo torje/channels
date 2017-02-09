@@ -1,6 +1,5 @@
 import std.typecons;
 synchronized class NonBlockingChannel(t){
-  alias Bundle = Tuple!(bool,t);
   private shared t[] queue;
   void insert(t i){
     queue ~= i;
